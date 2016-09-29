@@ -16,7 +16,7 @@ Backend:
 These are managed by DotEnv in development, initial setup is automatically done when running npm install using ```shell npm setup``` and in production set the environment through the .bash files.
 
 ```shell
-export port=8080
+export port=8000
 export dbHost=localhost
 export dbDialect=postgres
 export dbName=app
