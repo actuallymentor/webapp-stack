@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec",
-    "start": "nodemon app.js",
+    "start": "gulp clean; gulp build; nodemon app.js",
     "postinstall": "node setup.js; gulp build"
   },
   "repository": {
