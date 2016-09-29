@@ -1,10 +1,10 @@
 # Webapp skeleton
 
-Frontend:
-* MaterializeCSS
-* jQuery ( modular setup with gulp )
-* SASS (  compiled to gulp )
-* PUG as view structure ( compiled with gulp )
+## Quickstart
+* npm install
+* npm setup
+
+## Components
 
 Backend:
 * NodeJS + Express
@@ -12,7 +12,9 @@ Backend:
 * Passport with local strategy
 * Testing with Mocha
 
-Environment variables:
+##Environment variables
+
+These are managed by DotEnv in development, do initial setup using ```shell npm setup``` and in production set the environment through the .bash files.
 
 ```shell
 export port=8080
@@ -29,8 +31,3 @@ export cookieSecure=false
 export sessionSecret='super mega ukulele'
 export appURL='http://www.web.dev'
 ```
-
-
-This repository was a little experiment in building a simple web app structure with a separate frontend codebase and backend codebase ( no server side rendering ).
-
-I haven't used it to build anything serious, but might use it for some quick and dirty hackathon projects.
