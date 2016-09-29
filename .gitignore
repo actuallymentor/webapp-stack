@@ -1,6 +1,9 @@
 # Ignore environment vars
 .env
 
+# Frontend public
+frontend/public
+
 # Logs
 logs
 *.log
