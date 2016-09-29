@@ -23,20 +23,20 @@ function swallowError (error) {
 const paths = {
 	source: {
 		root: 	__dirname,
-		styles: __dirname + '/styles/*',
+		styles: __dirname + '/frontend/src/styles/*',
 		js: {
-			app: 	__dirname + '/scripts/*.js',
-			deps: 	__dirname + '/scripts/dependencies/*.js'
+			app: 	__dirname + '/frontend/src/scripts/*.js',
+			deps: 	__dirname + '/frontend/src/scripts/dependencies/*.js'
 		},
-		pug: 	__dirname + '/views/**/*.pug',
-		fonts: __dirname + '/fonts/**/*'
+		pug: 	__dirname + '/frontend/src/views/**/*.pug',
+		fonts: __dirname + '/frontend/src/fonts/**/*'
 	},
 	build: {
-		root: 	__dirname + '/../public/',
-		css: 	__dirname + '/../public/css/',
-		js: 	__dirname + '/../public/js/',
-		html: 	__dirname + '/../public/',
-		fonts:  __dirname + '/../public/fonts/'
+		root: 	__dirname + '/frontend/public/',
+		css: 	__dirname + '/frontend/public/css/',
+		js: 	__dirname + '/frontend/public/js/',
+		html: 	__dirname + '/frontend/public/',
+		fonts:  __dirname + '/frontend/public/fonts/'
 	}
 }
 
