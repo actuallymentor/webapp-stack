@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "postinstall": "node setup.js"
   },
   "repository": {
     "type": "git",

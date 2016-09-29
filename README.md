@@ -2,7 +2,6 @@
 
 ## Quickstart
 * npm install
-* npm setup
 
 ## Components
 
@@ -14,7 +13,7 @@ Backend:
 
 ##Environment variables
 
-These are managed by DotEnv in development, do initial setup using ```shell npm setup``` and in production set the environment through the .bash files.
+These are managed by DotEnv in development, initial setup is automatically done when running npm install using ```shell npm setup``` and in production set the environment through the .bash files.
 
 ```shell
 export port=8080
