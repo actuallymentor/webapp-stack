@@ -19,7 +19,9 @@ main {
 
 // Navbar
 nav {
-	padding: 0 10px;
+	.brand-logo {
+		padding-left: 10px;
+	}
 	background-color: $primary-color;
 }
 
@@ -30,7 +32,7 @@ nav {
     background-color: $primary-color;
     .valign-wrapper {
     	height: 100%;
-	    margin-top: -32px;
+	    padding-bottom: 64px;
     }
     #headertitle {
     	margin: -20px 0 10px 0;
