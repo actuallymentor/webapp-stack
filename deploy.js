@@ -8,6 +8,8 @@ if ( !which( 'git' ) || !which( 'ssh' ) ) {
 	echo( 'You have git and ssh, proceeding' )
 }
 
-var gitstatus = exec( 'git status' ).grep( 'changes' )
+var gitstatus = exec( 'git status' )
 
-console.log( gitstatus )
+if ( gitstatus.indexOf( 'nothing to commit' ) ) {
+	echo( 'Repository has no incommitted changes' )
+}
