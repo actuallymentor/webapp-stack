@@ -2,7 +2,7 @@ console.log ( 'Initialising app' )
 
 // Import environment
 var dotenv = require( 'dotenv' )
-dotenv.load();
+dotenv.load()
 
 // Getting static express
 var app = require( './modules/express' )

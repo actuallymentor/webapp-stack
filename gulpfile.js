@@ -9,13 +9,19 @@ const pug 		 = require( 'gulp-pug' )
 const watch 	 = require( 'gulp-watch' )
 const uglify 	 = require( 'gulp-uglify' )
 const uglifycss  = require( 'gulp-uglifycss' )
+const browserify = require( 'browserify' )
+const source     = require( 'vinyl-source-stream' )
+const buffer 	 = require( 'vinyl-buffer' )
+const gulpif 	 = require( 'gulp-if' )
+var watchify 	 = require( 'watchify' )
+// Import environment
+const dotenv = require( 'dotenv' )
+dotenv.load()
 
 // Error handling
 function swallowError (error) {
-
   // Details of the error in the console
   console.log( error.toString() )
-
   this.emit( 'end' )
 }
 
@@ -23,13 +29,12 @@ function swallowError (error) {
 const paths = {
 	source: {
 		root: 	__dirname,
-		styles: __dirname + '/frontend/src/styles/*',
-		js: {
-			app: 	__dirname + '/frontend/src/scripts/*.js',
-			deps: 	__dirname + '/frontend/src/scripts/dependencies/*.js'
+		styles: {
+			materialize: [ __dirname + '/node_modules/materialize-css/dist/'],
+			root: __dirname + '/frontend/src/styles/'
 		},
-		pug: 	__dirname + '/frontend/src/views/**/*.pug',
-		fonts: __dirname + '/frontend/src/fonts/**/*'
+		js: __dirname + '/frontend/src/scripts/',
+		pug: 	__dirname + '/frontend/src/views/**/*.pug'
 	},
 	build: {
 		root: 	__dirname + '/frontend/public/',
@@ -52,7 +57,7 @@ gulp.task( 'clean', ( cb ) => {
 
 // Compiling and writing styles
 gulp.task( 'styles', ( cb ) => {
-	return gulp.src( paths.source.styles )
+	return gulp.src( paths.source.styles.root + '*' )
 	.pipe( sourcemaps.init() )
 	.pipe( sass() )
 	.on( 'error', swallowError )
@@ -63,34 +68,39 @@ gulp.task( 'styles', ( cb ) => {
 	.pipe( gulp.dest( paths.build.css ) )
 } )
 
-// Compiling and writing styles
-gulp.task( 'fonts', ( cb ) => {
-	return gulp.src([paths.source.fonts])
-	.pipe(gulp.dest(paths.build.fonts));
+// Dependencies
+gulp.task( 'materialize', ( cb ) => {
+	// Get materialize css
+	gulp.src(paths.source.styles.materialize + 'css/materialize.css')
+	.pipe(gulp.dest(paths.source.styles.root))
+
+	// Get materialize fonts
+	gulp.src(paths.source.styles.materialize + 'fonts/roboto/*')
+	.pipe(gulp.dest(paths.build.fonts + '/roboto'))
+	return
 } )
 
-// Compiling and writing scripts, they are all combined into one all.js file
-gulp.task( 'dependency-scripts', ( cb ) => {
-	return gulp.src( paths.source.js.deps )
-	.pipe( sourcemaps.init() )
-	.pipe( concat('dependencies.js') )
-	.pipe( uglify() )
-	.pipe( sourcemaps.write('.') )
-	.pipe( gulp.dest( paths.build.js ) )
-} )
-
+var bundler;
 // Compiling and writing scripts, they are all combined into one all.js file
 gulp.task( 'scripts', ( cb ) => {
-	return gulp.src( paths.source.js.app )
-	.pipe( sourcemaps.init() )
-	.pipe( concat('app.js') )
+	bundler = bundler || watchify(browserify( {
+		debug: true,
+		extensions: ['.jsx', '.js'],
+		entries: paths.source.js + '/main.js',
+		cache: {},
+		packageCache: {},
+		fullPaths: true
+	} ))
+	return bundler
+	.bundle()
+	.pipe( source('app.js') )
+	.pipe( buffer() )
 	.pipe( babel({
-		presets: ['es2015']
+		presets: ['es2015'],
+		compact: false
 	}))
-	.on( 'error', swallowError )
-	.pipe( uglify() )
-	.pipe( sourcemaps.write('.') )
-	.pipe( gulp.dest( paths.build.js ) )
+	.pipe( gulpif( (process.env.NODE_ENV == 'production'), uglify() ) )
+	.pipe( gulp.dest(paths.build.js) )
 } )
 
 // Compiling and writing the pug synax views to html
@@ -101,14 +111,13 @@ gulp.task( 'views', ( cb ) => {
 } )
 
 // Have one task that completes all build tasks
-gulp.task('build', ['clean', 'styles', 'fonts', 'dependency-scripts', 'scripts', 'views'], () => {})
+gulp.task('build', ['clean', 'materialize', 'styles','scripts', 'views'], () => {})
 
 // Watch the source directory for changes and compile when changes are detected
 gulp.task( 'watch', ['clean'], () => {
 	gulp.start( 'build' )
-	gulp.watch( paths.source.js.app, ['scripts'] )
-	gulp.watch( paths.source.js.deps, ['dependency-scripts'] )
-	gulp.watch( paths.source.styles, ['styles'] )
+	gulp.watch( paths.source.js + '/**/*.js', ['scripts'] )
+	gulp.watch( paths.source.styles.root + '*', ['styles'] )
 	gulp.watch( paths.source.fonts, ['fonts'] )
 	gulp.watch( paths.source.pug, ['views'] )
 } )
