@@ -13,7 +13,8 @@ const browserify = require( 'browserify' )
 const source     = require( 'vinyl-source-stream' )
 const buffer 	 = require( 'vinyl-buffer' )
 const gulpif 	 = require( 'gulp-if' )
-var watchify 	 = require( 'watchify' )
+const watchify 	 = require( 'watchify' )
+const babelify 	 = require( 'babelify' )
 // Import environment
 const dotenv = require( 'dotenv' )
 dotenv.load()
@@ -68,6 +69,34 @@ gulp.task( 'styles', ( cb ) => {
 	.pipe( gulp.dest( paths.build.css ) )
 } )
 
+var browser
+browser = browser || watchify(
+	browserify( paths.source.js + '/main.js', {
+		debug: true,
+		cache: {},
+		packageCache: {},
+		fullPaths: true
+	} )
+	.transform("babelify", {
+		presets: ["es2015", "react"]
+	})
+	)
+// Compiling and writing scripts, they are all combined into one all.js file
+function bundle() {
+	console.log('Building scripts')
+	return browser
+	.bundle()
+	.pipe( source('app.js') )
+	.pipe( buffer() )
+	.pipe(sourcemaps.init({loadMaps: true}))
+	.pipe( gulpif( (process.env.NODE_ENV == 'production'), uglify() ) )
+	.pipe(sourcemaps.write('.'))
+	.pipe( gulp.dest(paths.build.js) )
+}
+// browser.on( 'update', bundle )
+gulp.task( 'scripts', bundle )
+
+
 // Dependencies
 gulp.task( 'materialize', ( cb ) => {
 	// Get materialize css
@@ -78,29 +107,6 @@ gulp.task( 'materialize', ( cb ) => {
 	gulp.src(paths.source.styles.materialize + 'fonts/roboto/*')
 	.pipe(gulp.dest(paths.build.fonts + '/roboto'))
 	return
-} )
-
-var bundler;
-// Compiling and writing scripts, they are all combined into one all.js file
-gulp.task( 'scripts', ( cb ) => {
-	bundler = bundler || watchify(browserify( {
-		debug: true,
-		extensions: ['.jsx', '.js'],
-		entries: paths.source.js + '/main.js',
-		cache: {},
-		packageCache: {},
-		fullPaths: true
-	} ))
-	return bundler
-	.bundle()
-	.pipe( source('app.js') )
-	.pipe( buffer() )
-	.pipe( babel({
-		presets: ['es2015'],
-		compact: false
-	}))
-	.pipe( gulpif( (process.env.NODE_ENV == 'production'), uglify() ) )
-	.pipe( gulp.dest(paths.build.js) )
 } )
 
 // Compiling and writing the pug synax views to html
